@@ -1,0 +1,20 @@
+group: tower_of_hanoi
+group_alias: "Tower of Hanoi Benchmark"
+task:
+  - tower_of_hanoi_3
+  - tower_of_hanoi_4
+  - tower_of_hanoi_5
+aggregate_metric_list:
+  - metric: hanoi_solution_valid
+    aggregation: mean
+    weight_by_size: true
+  - metric: hanoi_goal_reached
+    aggregation: mean
+    weight_by_size: true
+  - metric: hanoi_move_accuracy
+    aggregation: mean
+    weight_by_size: true
+metadata:
+  version: 1.0
+  description: "Tower of Hanoi puzzle evaluation suite for sequential reasoning and planning"
+
