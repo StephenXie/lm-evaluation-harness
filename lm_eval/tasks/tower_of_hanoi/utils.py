@@ -7,7 +7,7 @@ import re
 from textwrap import dedent
 from typing import Any, Iterable
 
-from .simulator import HanoiSolutionValidator
+from lm_eval.tasks.tower_of_hanoi.simulator import HanoiSolutionValidator
 
 SYSTEM_PROMPT = dedent(
     """\

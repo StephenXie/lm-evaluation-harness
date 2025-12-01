@@ -1,4 +1,4 @@
-"""Tower of Hanoi task package."""
+"""Tower of Hanoi task module."""
 
 from . import simulator, utils  # noqa: F401
 
