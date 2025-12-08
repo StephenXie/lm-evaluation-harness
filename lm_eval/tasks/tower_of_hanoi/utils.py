@@ -163,6 +163,54 @@ def _literal_eval_moves(candidate: str | None) -> list[list[int]] | None:
 
 
 # ---------------------------------------------------------------------------
+# Aggregation functions (exclude malformed moves from averages)
+# ---------------------------------------------------------------------------
+def _wellformed_values(items):
+    """Helper: return metric values for entries flagged as well-formed."""
+    return [metric_value for metric_value, include_flag in items if include_flag > 0.0]
+
+
+def hanoi_solution_valid_agg(items):
+    """
+    Aggregation for hanoi_solution_valid: only count well-formed attempts.
+    Items is a list of (metric_value, include_flag) tuples.
+    include_flag > 0 means the attempt was well-formed.
+    """
+    valid_items = _wellformed_values(items)
+    return sum(valid_items) / len(valid_items) if valid_items else 0.0
+
+
+def hanoi_goal_reached_agg(items):
+    """Aggregation for hanoi_goal_reached: only count well-formed attempts."""
+    valid_items = _wellformed_values(items)
+    return sum(valid_items) / len(valid_items) if valid_items else 0.0
+
+
+def hanoi_move_accuracy_agg(items):
+    """Aggregation for hanoi_move_accuracy: only count well-formed attempts."""
+    valid_items = _wellformed_values(items)
+    return sum(valid_items) / len(valid_items) if valid_items else 0.0
+
+
+def hanoi_first_error_step_agg(items):
+    """Aggregation for hanoi_first_error_step: only count well-formed attempts."""
+    valid_items = _wellformed_values(items)
+    return sum(valid_items) / len(valid_items) if valid_items else -1.0
+
+
+def hanoi_num_moves_agg(items):
+    """Aggregation for hanoi_num_moves: only count well-formed attempts."""
+    valid_items = _wellformed_values(items)
+    return sum(valid_items) / len(valid_items) if valid_items else 0.0
+
+
+def hanoi_wellformed_agg(items):
+    """Aggregation for hanoi_wellformed: simple mean over all items."""
+    values = [metric_value for metric_value, _ in items]
+    return sum(values) / len(values) if values else 0.0
+
+
+# ---------------------------------------------------------------------------
 # Result processing + metrics
 # ---------------------------------------------------------------------------
 def process_results(doc: dict, results: list) -> dict[str, float]:
@@ -173,6 +221,7 @@ def process_results(doc: dict, results: list) -> dict[str, float]:
     summary = VALIDATOR.validate_solution(
         num_disks=doc["num_disks"],
         moves=moves,
+        num_pegs=doc.get("num_pegs", 3),
         initial_state=doc.get("initial_state"),
         goal_state=doc.get("goal_state"),
     )
@@ -184,12 +233,18 @@ def process_results(doc: dict, results: list) -> dict[str, float]:
         summary.num_valid_moves / summary.total_moves if summary.total_moves else 0.0
     )
     first_error = summary.first_error_index if summary.first_error_index is not None else -1
+    wellformed = 0.0 if summary.has_malformed_moves else 1.0
 
+    include_flag = wellformed
+    num_moves_value = float(summary.total_moves)
+
+    # Return tuples of (metric_value, include_flag) so aggregation functions can filter
     return {
-        "hanoi_solution_valid": 1.0 if summary.is_valid else 0.0,
-        "hanoi_goal_reached": 1.0 if summary.goal_reached else 0.0,
-        "hanoi_move_accuracy": move_accuracy,
-        "hanoi_first_error_step": float(first_error),
-        "hanoi_num_moves": float(summary.total_moves),
+        "hanoi_solution_valid": (1.0 if summary.is_valid else 0.0, include_flag),
+        "hanoi_goal_reached": (1.0 if summary.goal_reached else 0.0, include_flag),
+        "hanoi_move_accuracy": (move_accuracy, include_flag),
+        "hanoi_first_error_step": (float(first_error), include_flag),
+        "hanoi_num_moves": (num_moves_value, include_flag),
+        "hanoi_wellformed": (wellformed, 1.0),
     }
 

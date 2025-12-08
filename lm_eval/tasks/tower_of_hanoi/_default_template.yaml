@@ -12,24 +12,26 @@ filter_list:
       - function: "custom"
         filter_fn: !function utils.extract_moves_from_response
 metric_list:
+  - metric: hanoi_wellformed
+    aggregation: !function utils.hanoi_wellformed_agg
+    higher_is_better: true
   - metric: hanoi_solution_valid
-    aggregation: mean
+    aggregation: !function utils.hanoi_solution_valid_agg
     higher_is_better: true
   - metric: hanoi_goal_reached
-    aggregation: mean
+    aggregation: !function utils.hanoi_goal_reached_agg
     higher_is_better: true
   - metric: hanoi_move_accuracy
-    aggregation: mean
+    aggregation: !function utils.hanoi_move_accuracy_agg
     higher_is_better: true
   - metric: hanoi_first_error_step
-    aggregation: mean
+    aggregation: !function utils.hanoi_first_error_step_agg
     higher_is_better: true
   - metric: hanoi_num_moves
-    aggregation: mean
+    aggregation: !function utils.hanoi_num_moves_agg
     higher_is_better: false
 generation_kwargs:
   until:
-    - "\n\n"
     - "Question:"
     - "</s>"
     - "<|im_end|>"

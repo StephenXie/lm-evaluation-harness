@@ -1,10 +1,19 @@
 group: tower_of_hanoi
 group_alias: "Tower of Hanoi Benchmark"
 task:
-  - tower_of_hanoi_3
-  - tower_of_hanoi_4
-  - tower_of_hanoi_5
+  - tower_of_hanoi_n3_p3
+  - tower_of_hanoi_n4_p3
+  - tower_of_hanoi_n5_p3
+  - tower_of_hanoi_n3_p4
+  - tower_of_hanoi_n4_p4
+  - tower_of_hanoi_n5_p4
+  - tower_of_hanoi_n3_p5
+  - tower_of_hanoi_n4_p5
+  - tower_of_hanoi_n5_p5
 aggregate_metric_list:
+  - metric: hanoi_wellformed
+    aggregation: mean
+    weight_by_size: true
   - metric: hanoi_solution_valid
     aggregation: mean
     weight_by_size: true
